@@ -14,7 +14,7 @@ Add dependencies to your `platformio.ini` file:
 
 ```ini
 lib_deps = 
-    https://github.com/nht173/WebOTA.git^@1.0.0
+    https://github.com/nht173/WebOTA.git@^1.0.0
 ```
 
 ## Usage
