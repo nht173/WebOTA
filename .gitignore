@@ -1,0 +1,6 @@
+.DS_Store
+.pio
+.vscode
+.idea
+web/UPDATE_PAGE
+src/main.cpp

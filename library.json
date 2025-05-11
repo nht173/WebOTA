@@ -1,0 +1,23 @@
+{
+  "name": "WebOTA",
+  "version": "1.0.0",
+  "description": "WebOTA is a library for over-the-air updates via the web.",
+  "keywords": "web, ota, update",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nht173/WebOTA.git"
+  },
+  "authors": [
+    {
+      "name": "Thai Nguyen",
+      "email": "nht173@gmail.com",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {},
+  "frameworks": "arduino",
+  "platforms": [
+    "espressif8266, espressif32"
+  ]
+}
