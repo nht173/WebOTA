@@ -14,7 +14,7 @@ Add dependencies to your `platformio.ini` file:
 
 ```ini
 lib_deps = 
-    nht173/WebOTA@^1.0.0
+    nht173/WebOTA@^1.0.1
 ```
 
 ## Usage
