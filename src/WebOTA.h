@@ -2,8 +2,12 @@
 #define WEB_OTA_H
 
 #include <functional>
-#include <Ticker.h>
 #include <map>
+#if defined(ESP32)
+#include <esp_timer.h>
+#else
+#include <Ticker.h>
+#endif
 
  #if __has_include_next(<ESPAsyncWebServer.h>)
  #define USE_OTA_ASYNC
@@ -197,9 +201,8 @@ public:
         _onError = cb;
     }
 
-private:
+protected:
     String _path = "/update";
-    Ticker _ticker;
     OTAWS_TYPE* _server{};
     bool _isPageHtml = false;
     const char* _customUpdatePage = nullptr;
@@ -212,6 +215,17 @@ private:
     std::function<void(size_t, size_t)> _onProgress;
     std::function<void()> _onEnd;
     std::function<void(int)> _onError;
+
+private:
+#if defined(ESP32)
+    esp_timer_handle_t _timer = nullptr;
+#else
+    Ticker _ticker;
+#endif
+
+    static void _restartCB() {
+        ESP.restart();
+    }
 };
 
 #endif // WEB_OTA_H

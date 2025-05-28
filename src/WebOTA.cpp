@@ -14,6 +14,16 @@ void WebOTA::begin() {
         return;
     }
 
+    // Init timer
+#ifdef ESP32
+    esp_timer_create_args_t timerArg = {
+            .callback = reinterpret_cast<esp_timer_cb_t>(_restartCB),
+            .arg = nullptr,
+            .name = "WebOTARestartTimer"
+    };
+    esp_timer_create(&timerArg, &_timer);
+#endif
+
     // Set default parameters
     if (getParameter("FIRMWARE_VERSION") == "")
         _parameters["FIRMWARE_VERSION"] = "Unknown version";
@@ -63,9 +73,12 @@ void WebOTA::begin() {
         } else {
             request->send(200, "text/plain", "OK");
         }
-        _ticker.once(2, []() {
-            ESP.restart();
-        });
+#ifdef ESP32
+        esp_timer_stop(_timer);
+        esp_timer_start_once(_timer, 2000 * 1000); // 2 seconds
+#else
+        _ticker.once(2, []() { ESP.restart(); });
+#endif
     }, [this](AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len,
               bool final) {
         if (index == 0) {
@@ -103,7 +116,7 @@ void WebOTA::begin() {
         }
     });
 
-#else
+#else // ESP32 or ESP8266 without AsyncWebServer
     _server->on(_path, HTTP_GET, [this]() {
         if (_isPageHtml) {
             _server->send(200, "text/html", _customUpdatePage);
@@ -124,9 +137,12 @@ void WebOTA::begin() {
         } else {
             _server->send(200, "text/plain", "OK");
         }
-        _ticker.once(2, []() {
-            ESP.restart();
-        });
+#ifdef ESP32
+        esp_timer_stop(_timer);
+        esp_timer_start_once(_timer, 2000 * 1000); // 2 seconds
+#else
+        _ticker.once(2, []() { ESP.restart(); });
+#endif
     }, [this]() {
         HTTPUpload& upload = _server->upload();
         if (upload.status == UPLOAD_FILE_START) {
