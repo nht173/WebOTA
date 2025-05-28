@@ -14,7 +14,7 @@ Add dependencies to your `platformio.ini` file:
 
 ```ini
 lib_deps = 
-    nht173/WebOTA@^1.0.1
+    nht173/WebOTA@^1.0.2
 ```
 
 ## Usage
@@ -68,4 +68,4 @@ By default, it has 3 parameters: FIRMWARE_VERSION, DEVICE_NAME, and DEVICE_ID. Y
 # Future Improvements
 
 - Add support authentication for OTA updates
-- Add support for checking firmware version before updating****
+- Add support for checking firmware version before updating

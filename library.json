@@ -1,6 +1,6 @@
 {
   "name": "WebOTA",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "WebOTA is a library for over-the-air updates via the web.",
   "keywords": "web, ota, update",
   "repository": {
