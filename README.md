@@ -14,7 +14,7 @@ Add dependencies to your `platformio.ini` file:
 
 ```ini
 lib_deps = 
-    nht173/WebOTA@^1.0.2
+    nht173/WebOTA@^1.1.0
 ```
 
 ## Usage
@@ -62,6 +62,43 @@ You can set custom parameters for the update web page by modifying the `setParam
 You can get the parameters as JSON by GET request to `endpoint/info`
 
 By default, it has 3 parameters: FIRMWARE_VERSION, DEVICE_NAME, and DEVICE_ID. You can change them to any other parameters you prefer.
+
+## Captive Portal (soft AP)
+
+This library provides a small `CaptivePortal` utility that makes it easy to run the device as a Soft AP and redirect connected clients to the OTA web page. It uses a DNS server to capture requests and redirects common OS probe paths (e.g. `/generate_204`, `/hotspot-detect.html`) to the configured OTA endpoint.
+
+Usage notes:
+
+- Include the header: `#include <CaptivePortal.h>`
+- You can attach an existing server or let `CaptivePortal` create one for you.
+- For synchronous server examples (WebServer/ESP8266WebServer) use:
+
+```cpp
+OTAWS_TYPE server(80); // resolves to WebServer or ESP8266WebServer
+WebOTA ota(server);
+CaptivePortal portal(server);
+portal.begin("OTA-Portal", "", "/update");
+ota.begin();
+server.begin();
+```
+
+- For asynchronous server examples (ESPAsyncWebServer) use:
+
+```cpp
+AsyncWebServer server(80);
+WebOTA ota(server);
+CaptivePortal portal(server);
+portal.begin("OTA-Portal-Async", "", "/update");
+ota.begin();
+server.begin();
+```
+
+Examples shipped with this repository:
+
+- `examples/WebServer/CaptivePortalOTA.ino` — captive portal + WebServer example
+- `examples/AsyncWebServer/CaptivePortalAsyncOTA.ino` — captive portal + AsyncWebServer example
+
+Connect to the AP, open any URL and the captive portal will redirect you to `/update` where you can upload firmware.
 
 ---
 

@@ -211,6 +211,25 @@
         }
     }
 
+    function fileChanged() {
+        if (file) {
+            $fileLabel.text(file.name);
+            $uploadBtn.prop('disabled', false);
+        } else {
+            $fileLabel.text('');
+            $uploadBtn.prop('disabled', true);
+        }
+
+        // const reader = new FileReader();
+        // reader.onload = function (e) {
+        //     console.log(e)
+        //     const data = new Uint8Array(e.target.result);
+        //     const text = new TextDecoder().decode(data);
+        //     console.log(text.match(/\d+\.\d+\.\d+/g));
+        // };
+        // reader.readAsArrayBuffer(file);
+    }
+
     function removeFile() {
         file = null;
         $fileElem.val('');
@@ -230,14 +249,12 @@
         e.preventDefault();
         $dropArea.removeClass('dragover');
         file = e.originalEvent.dataTransfer.files[0];
-        $fileLabel.text(file.name);
-        $uploadBtn.prop('disabled', false);
+        fileChanged();
     });
 
     $fileElem.on('change', function () {
         file = this.files[0];
-        $fileLabel.text(file.name);
-        $uploadBtn.prop('disabled', false);
+        fileChanged();
     });
 
     $uploadBtn.on('click', function () {

@@ -9,23 +9,12 @@
 #include <Ticker.h>
 #endif
 
- #if __has_include_next(<ESPAsyncWebServer.h>)
- #define USE_OTA_ASYNC
- #endif
+#if __has_include_next(<ESPAsyncWebServer.h>)
+#define USE_OTA_ASYNC
+#endif
 
 /* Server type */
-#ifdef USE_OTA_ASYNC
-#include <ESPAsyncWebServer.h>
-#define OTAWS_TYPE AsyncWebServer
-#else
-#if defined(ESP32)
-#include <WebServer.h>
-#define OTAWS_TYPE WebServer
-#elif defined(ESP8266)
-#include <ESP8266WebServer.h>
-#define OTAWS_TYPE ESP8266WebServer
-#endif
-#endif
+#include "WebOTAType.h"
 
 #ifndef UPDATE_SIZE_UNKNOWN
 #define UPDATE_SIZE_UNKNOWN 0xFFFFFFFF
