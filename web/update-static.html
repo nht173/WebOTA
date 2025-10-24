@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTA Update</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro@4cac1a6/css/all.css" rel="stylesheet"
+        type="text/css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --c1: 15, 163, 177;
+            --c3: 249, 247, 243;
+            --ct: 51, 51, 51;
+            --ctm: 200, 200, 200;
+            --ctl: 255, 255, 255;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: sans-serif;
+            font-size: 1.1rem;
+            color: rgb(var(--ct));
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .mobile {
+            width: 100%;
+            max-width: 600px;
+            padding: 1rem;
+        }
+
+        .mt-4 {
+            margin-top: 1.5rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+
+        .ms-4 {
+            margin-left: 1.5rem;
+        }
+
+        .text-danger {
+            color: red;
+        }
+
+        .flex {
+            display: flex;
+            align-items: center;
+        }
+
+        .center {
+            display: flex;
+            justify-content: center;
+        }
+
+        .callout {
+            padding: 1rem;
+            background: rgb(var(--c3));
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-left: 6px solid rgba(237, 222, 164, 0.5);
+        }
+
+        .callout>div {
+            margin-bottom: 0.4rem;
+        }
+
+        .badge {
+            padding: 0.2rem 0.5rem;
+            background: rgb(var(--c1));
+            color: rgb(var(--ctl));
+            border-radius: 1rem;
+            font-size: 1rem;
+        }
+
+        .btn-1 {
+            background-color: rgb(var(--c1));
+            padding: 6px 12px;
+            color: rgb(var(--ctl));
+            border: 0;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .btn-1:hover {
+            opacity: 0.8;
+            transform: scale(1.02);
+        }
+
+        .btn-1:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100%;
+            z-index: 999;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        .loading.show {
+            opacity: 1;
+        }
+
+        .spinner {
+            width: 4rem;
+            height: 4rem;
+            border: 0.5rem solid rgba(var(--ct), 0.1);
+            border-top: 0.5rem solid rgb(var(--c1));
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        input {
+            padding: 0.5rem 0.8rem;
+            font-size: 1.1rem;
+            border: 1px solid rgba(var(--ct), 0.3);
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: rgb(var(--c1));
+        }
+
+        input:disabled {
+            background: rgba(0, 0, 0, 0.1);
+            color: rgb(var(--ct));
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .wifi svg {
+            width: 2rem;
+            height: 1.8rem;
+        }
+
+        .psk svg {
+            width: 1.2rem;
+            height: 1.2rem;
+        }
+
+        .drop-area {
+            position: relative;
+            border: 2px dashed rgb(var(--ctm));
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            color: rgb(var(--ct));
+            margin-bottom: 20px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .drop-area.dragover {
+            border-color: rgb(var(--c1));
+            background: rgba(var(--c1), 0.2);
+        }
+
+        .drop-area .file-label {
+            height: 30px;
+            line-height: 30px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: rgb(var(--c1));
+            margin-top: 0.5rem;
+        }
+
+        .drop-area-progress {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.85);
+            z-index: 10;
+        }
+
+        .drop-area.uploading .drop-area-progress {
+            display: flex;
+        }
+
+        .drop-area .progress {
+            position: relative;
+            width: 100%;
+            height: 25px;
+            background: rgb(var(--ctm));
+            border-radius: 20px;
+        }
+
+        .drop-area .progress-bar {
+            height: 18px;
+            width: 0;
+            background: rgb(var(--c1));
+            border-radius: 20px;
+            transition: width 0.6s ease-in-out;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading show">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container">
+        <div class="mobile">
+            <div class="callout">
+                <h3>Info</h3>
+                <div>Device: %DEVICE_NAME%</div>
+                <div>Firmware version: <span class="badge">%FIRMWARE_VERSION%</span></div>
+                <div>Device ID: %DEVICE_ID%</div>
+            </div>
+            <div class="callout mt-4">
+                <h3>Update firmware</h3>
+                <div class="drop-area">
+                    <div class="drop-area-progress">
+                        <div style="width: 80%;">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width:0%"></div>
+                                <div class="nyan-cat"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-center mb-3 fa-5x">
+                            <i class="far fa-cloud-upload-alt text-muted"></i>
+                        </div>
+                        <p style="line-height: 30px;">
+                            Drag and drop the firmware file here or
+                            <label for="file" class="ms-2 btn-1">Choose file</label>
+                        </p>
+                        <input type="file" id="file" style="display:none" accept=".bin">
+                    </div>
+                    <div class="file-label"></div>
+                </div>
+
+                <div class="center"><button class="btn-1 mt-4" id="upload">Upload</button></div>
+                <div class="center mt-4" id="status"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const $ = s => document.querySelector(s);
+        const $loading = $('.loading');
+        const $dropArea = $('.drop-area');
+        const $file = $('#file');
+        const $uploadBtn = $('#upload');
+        const $progressBar = $('.progress-bar');
+        const $status = $('#status');
+        const $fileLabel = $('.file-label');
+        let file = null;
+
+        fetch('/update/info').then(r => r.text())
+            .then(d => {
+                if (typeof d === 'string') d = JSON.parse(d);
+                document.querySelectorAll('body *:not(script)').forEach(el => {
+                    if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
+                        el.innerHTML = el.innerHTML.replace(/%([A-Z0-9_]+)%/g, (match, key) =>
+                            key in d ? d[key] : match
+                        );
+                    }
+                });
+                $loading.classList.remove('show')
+                setTimeout(() => $loading.style.display = 'none', 200)
+            })
+
+        $dropArea.addEventListener('dragover', e => {
+            e.preventDefault();
+            $dropArea.classList.add('dragover');
+        });
+        $dropArea.addEventListener('dragleave', () => {
+            $dropArea.classList.remove('dragover');
+        });
+        $dropArea.addEventListener('drop', e => {
+            e.preventDefault();
+            $dropArea.classList.remove('dragover');
+            file = e.dataTransfer.files[0];
+            fileChanged();
+        });
+
+        function uploadStart() {
+            $uploadBtn.setAttribute('disabled', true);
+            $dropArea.classList.add('uploading');
+            $progressBar.style.width = '0%';
+            $status.innerHTML = '';
+        }
+
+        function uploadEnd(status = false) {
+            if (status) {
+                $status.innerHTML = '<span class="text-success">Upload successfully. Device restarting...</span>';
+            } else {
+                $status.innerHTML = '<span class="text-danger">Upload failed</span>';
+            }
+            removeFile();
+            setTimeout(function () {
+                $dropArea.classList.remove('uploading');
+                $progressBar.style.width = '0%';
+            }, 2000);
+            if (status) {
+                setTimeout(function () {
+                    window.location.reload();
+                }, 8000);
+            }
+        }
+
+        function fileChanged() {
+            console.log('File changed:', file);
+            if (file) {
+                $fileLabel.innerHTML = file.name;
+                $uploadBtn.removeAttribute('disabled');
+            } else {
+                $fileLabel.innerHTML = '';
+                $uploadBtn.setAttribute('disabled', true);
+            }
+        }
+
+        function removeFile() {
+            file = null;
+            $file.value = null;
+            $fileLabel.innerHTML = '';
+            $uploadBtn.setAttribute('disabled', true);
+        }
+
+
+        $file.addEventListener('change', e => {
+            file = e.target.files[0];
+            fileChanged();
+        });
+
+        $uploadBtn.addEventListener('click', e => {
+            if (!file) return;
+            if (!file.name.endsWith('.bin')) {
+                $status.innerHTML = '<span class="text-danger">Please choose .bin file</span>';
+                removeFile();
+                return;
+            }
+            const formData = new FormData();
+            formData.append('update', file);
+            uploadStart();
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/update', true);
+            xhr.upload.onprogress = function (e) {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    $progressBar.style.width = `${percent}%`;
+                }
+            };
+            xhr.onload = () => {
+                uploadEnd(xhr.status === 200)
+            };
+            xhr.onerror = uploadEnd;
+            xhr.send(formData);
+        });
+    </script>
+</body>
+
+</html>
